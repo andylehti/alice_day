@@ -32,41 +32,56 @@ def buildNames():
     rng.shuffle(nameList)
     return nameList
 
-def getDayIndex(y, d):
+def getDayIndex(dt):
     base = datetime(1, 1, 1)
-    t = datetime(y, 1, 1) + timedelta(days=d)
-    delta = (t - base).days
-    return delta
+    return (dt - base).days
 
 nameList = buildNames()
 
-def getDayName(ds):
-    dt = datetime.strptime(ds, "%m/%d/%Y")
-    y = dt.year
-    d = (dt - datetime(y, 1, 1)).days
-    i = getDayIndex(y, d)
+def getDayName(dt):
+    i = getDayIndex(dt)
     return nameList[i % len(nameList)]
 
+# Centering everything using HTML
 st.set_page_config(page_title="Latin Day Generator", layout="centered")
 
-st.title("Latin Day Name Generator")
+st.markdown(
+    """
+    <style>
+    div.block-container {
+        text-align: center;
+    }
+    label, input, select, .stNumberInput, .stDateInput {
+        margin: 0 auto;
+    }
+    </style>
+    """, unsafe_allow_html=True
+)
+
+st.markdown("<h1 style='text-align:center; font-family:Helvetica; font-weight:900;'>Latin Day Name Generator</h1>", unsafe_allow_html=True)
 
 col1, col2, col3 = st.columns(3)
 
 with col1:
-    month = st.selectbox("Month", list(range(1, 13)), index=6)
+    month = st.selectbox("Month", list(range(1, 13)), index=6, format_func=lambda x: f"{x:02}")
 with col2:
     day = st.number_input("Day", min_value=1, max_value=31, value=31)
 with col3:
-    year = st.number_input("Year", value=2025)
+    year = st.number_input("Year", value=2025, step=1)
 
 try:
-    selected_date = datetime(year, month, day)
-    date_str = selected_date.strftime("%m/%d/%Y")
-    latin_name = getDayName(date_str)
+    dt = datetime(year, month, day)
+    name = getDayName(dt)
     st.markdown(
-        f"<div style='text-align:center; font-family:Helvetica; font-weight:900; font-size:48px; padding-top:30px;'>{latin_name} Day!</div>",
+        f"<div style='text-align:center; font-family:Helvetica; font-weight:900; font-size:48px; padding-top:30px;'>{name} Day!</div>",
         unsafe_allow_html=True
     )
 except ValueError:
-    st.warning("Invalid date. Please enter a valid combination of month, day, and year.")
+    st.warning("Invalid date. Try a valid combination of month, day, and year.")
+
+st.markdown("<br><br>", unsafe_allow_html=True)
+
+st.markdown(
+    "<div style='text-align:center; font-size:14px; color:gray;'>© 2025 Andrew Lehti — Creative Commons Attribution 4.0 International (CC BY 4.0)</div>",
+    unsafe_allow_html=True
+)
