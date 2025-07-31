@@ -1,6 +1,9 @@
 import streamlit as st
 import random
 from datetime import datetime, timedelta
+import hashlib
+import random
+from datetime import datetime, timedelta
 
 def buildPools():
     p1 = ['sol', 'pax', 'lux', 'ver', 'fin', 'vent', 'mar', 'dom', 'nec', 'clar', 'fer']
@@ -32,14 +35,19 @@ def buildNames():
     rng.shuffle(nameList)
     return nameList
 
-def getDayIndex(dt):
+def getDayIndex(y, d):
     base = datetime(1, 1, 1)
-    return (dt - base).days
+    t = datetime(y, 1, 1) + timedelta(days=d)
+    delta = (t - base).days
+    return delta
 
 nameList = buildNames()
 
-def getDayName(dt):
-    i = getDayIndex(dt)
+def getDayName(ds):
+    dt = datetime.strptime(ds, "%m/%d/%Y")
+    y = dt.year
+    d = (dt - datetime(y, 1, 1)).days
+    i = getDayIndex(y, d)
     return nameList[i % len(nameList)]
 
 # Centering everything using HTML
@@ -70,7 +78,7 @@ with col3:
     year = st.number_input("Year", value=2025, step=1)
 
 try:
-    dt = datetime(year, month, day)
+    dt = f"{month}/{day}/{year}"
     name = getDayName(dt)
     st.markdown(
         f"<div style='text-align:center; font-family:Helvetica; font-weight:900; font-size:48px; padding-top:30px;'>{name} Day!</div>",
