@@ -1,9 +1,7 @@
 import streamlit as st
-import random
 from datetime import datetime, timedelta
-import hashlib
+import random
 
-@st.cache_resource
 def buildPools():
     p1 = ['sol', 'pax', 'lux', 'ver', 'fin', 'vent', 'mar', 'dom', 'nec', 'clar', 'fer']
     p2 = ['aer', 'bell', 'cael', 'dict', 'equi', 'fort', 'glor', 'hon', 'ign', 'juv', 'luc', 'magn', 'nav', 'op', 'prim', 'quant', 'reg', 'sanct', 'ten', 'ult', 'vex', 'xer', 'zen']
@@ -16,7 +14,6 @@ def buildPools():
     suffixes = s1 + s2
     return prefixes, middles, suffixes
 
-@st.cache_resource
 def buildNames():
     pList, mList, sList = buildPools()
     names = set()
@@ -37,21 +34,18 @@ def buildNames():
 
 def getDayIndex(y, d):
     base = datetime(1, 1, 1)
-    t = datetime(y, 1, 1) + timedelta(days=d)
-    delta = (t - base).days
-    return delta
+    date = datetime(y, 1, 1) + timedelta(days=d)
+    return (date - base).days
 
-# This line now gets the cached list, not a new one
 nameList = buildNames()
 
-def getDayName(ds):
-    dt = datetime.strptime(ds, "%m/%d/%Y")
+def getLatinNameFromDate(dt):
     y = dt.year
     d = (dt - datetime(y, 1, 1)).days
     i = getDayIndex(y, d)
     return nameList[i % len(nameList)]
 
-# Centering everything using HTML
+# Streamlit UI
 st.set_page_config(page_title="Latin Day Generator", layout="centered")
 
 st.markdown(
@@ -61,36 +55,35 @@ st.markdown(
         text-align: center;
     }
     label, input, select, .stNumberInput, .stDateInput {
-        margin: 0 auto;
+        margin-left: auto;
+        margin-right: auto;
+        display: block;
     }
     </style>
     """, unsafe_allow_html=True
 )
 
-st.markdown("<h1 style='text-align:center; font-family:Helvetica; font-weight:900;'>Latin Day Name Generator</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='font-family:Helvetica; font-weight:900;'>Latin Day Name Generator</h1>", unsafe_allow_html=True)
 
-col1, col2, col3 = st.columns(3)
+cols = st.columns(3)
 
-with col1:
+with cols[0]:
     month = st.selectbox("Month", list(range(1, 13)), index=6, format_func=lambda x: f"{x:02}")
-with col2:
+
+with cols[1]:
     day = st.number_input("Day", min_value=1, max_value=31, value=31)
-with col3:
+
+with cols[2]:
     year = st.number_input("Year", value=2025, step=1)
 
 try:
-    dt = f"{month}/{day}/{year}"
-    name = getDayName(dt)
-    st.markdown(
-        f"<div style='text-align:center; font-family:Helvetica; font-weight:900; font-size:48px; padding-top:30px;'>{name} Day on {dt}!</div>",
-        unsafe_allow_html=True
-    )
-except ValueError:
-    st.warning("Invalid date. Try a valid combination of month, day, and year.")
-
-st.markdown("<br><br>", unsafe_allow_html=True)
+    dt = datetime(year, month, day)
+    name = getLatinNameFromDate(dt)
+    st.markdown(f"<div style='font-family:Helvetica; font-weight:900; font-size:48px; padding-top:30px;'>{name} Day!</div>", unsafe_allow_html=True)
+except Exception:
+    st.warning("Invalid date. Please enter a valid date.")
 
 st.markdown(
-    "<div style='text-align:center; font-size:14px; color:gray;'>© 2025 Andrew Lehti — Creative Commons Attribution 4.0 International (CC BY 4.0)</div>",
+    "<br><br><div style='font-size:14px; color:gray;'>© 2025 Andrew Lehti — Creative Commons Attribution 4.0 International (CC BY 4.0)</div>",
     unsafe_allow_html=True
 )
