@@ -82,7 +82,7 @@ try:
     dt = f"{month}/{day}/{year}"
     name = getDayName(dt)
     st.markdown(
-        f"<div style='text-align:center; font-family:Helvetica; font-weight:900; font-size:48px; padding-top:30px;'>{name} Day!</div>",
+        f"<div style='text-align:center; font-family:Helvetica; font-weight:900; font-size:48px; padding-top:30px;'>{name} Day on {dt}!</div>",
         unsafe_allow_html=True
     )
 except ValueError:
