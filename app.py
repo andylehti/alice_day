@@ -2,9 +2,8 @@ import streamlit as st
 import random
 from datetime import datetime, timedelta
 import hashlib
-import random
-from datetime import datetime, timedelta
 
+@st.cache_resource
 def buildPools():
     p1 = ['sol', 'pax', 'lux', 'ver', 'fin', 'vent', 'mar', 'dom', 'nec', 'clar', 'fer']
     p2 = ['aer', 'bell', 'cael', 'dict', 'equi', 'fort', 'glor', 'hon', 'ign', 'juv', 'luc', 'magn', 'nav', 'op', 'prim', 'quant', 'reg', 'sanct', 'ten', 'ult', 'vex', 'xer', 'zen']
@@ -17,6 +16,7 @@ def buildPools():
     suffixes = s1 + s2
     return prefixes, middles, suffixes
 
+@st.cache_resource
 def buildNames():
     pList, mList, sList = buildPools()
     names = set()
@@ -41,6 +41,7 @@ def getDayIndex(y, d):
     delta = (t - base).days
     return delta
 
+# This line now gets the cached list, not a new one
 nameList = buildNames()
 
 def getDayName(ds):
